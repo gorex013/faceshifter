@@ -8,8 +8,10 @@ arcface:
   vector_size: 256
 
 data:
-  dataset_dir: ''
-  valset_dir: ''
+  #  dataset_dir: '/media/vasile/SLOW DATA/00000/dataset_dir'
+  #  valset_dir: '/media/vasile/SLOW DATA/00000/valset_dir'
+  dataset_dir: '/media/vasile/SLOW DATA/faceshifter/dataset_dir'
+  valset_dir: '/media/vasile/SLOW DATA/faceshifter/valset_dir'
 
 model:
   learning_rate_E_G: 4e-4
@@ -20,5 +22,5 @@ model:
 
   batch_size: 16
 
-  num_workers: 16
+  num_workers: 12
   grad_clip: 0.0

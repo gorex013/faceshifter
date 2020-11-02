@@ -18,6 +18,7 @@ from model.loss import GANLoss, AEI_Loss
 
 from dataset import *
 
+
 class AEINet(pl.LightningModule):
     def __init__(self, hparams):
         super(AEINet, self).__init__()
@@ -35,21 +36,16 @@ class AEINet(pl.LightningModule):
         self.Loss_GAN = GANLoss()
         self.Loss_E_G = AEI_Loss()
 
-
     def forward(self, target_img, source_img):
-        z_id = self.Z(F.interpolate(source_img, size=112, mode='bilinear'))
-        z_id = F.normalize(z_id)
-        z_id = z_id.detach()
+        z_id = F.normalize(self.Z(F.interpolate(source_img, size=112, mode='bilinear'))).detach()
 
         feature_map = self.E(target_img)
 
         output = self.G(z_id, feature_map)
 
-        output_z_id = self.Z(F.interpolate(output, size=112, mode='bilinear'))
-        output_z_id = F.normalize(output_z_id)
+        output_z_id = F.normalize(self.Z(F.interpolate(output, size=112, mode='bilinear')))
         output_feature_map = self.E(output)
         return output, z_id, output_z_id, feature_map, output_feature_map
-
 
     def training_step(self, batch, batch_idx, optimizer_idx):
         target_img, source_img, same = batch
@@ -61,8 +57,9 @@ class AEINet(pl.LightningModule):
 
             output_multi_scale_val = self.D(output)
             loss_GAN = self.Loss_GAN(output_multi_scale_val, True, for_discriminator=False)
-            loss_E_G, loss_att, loss_id, loss_rec = self.Loss_E_G(target_img, output, feature_map, output_feature_map, z_id,
-                                                             output_z_id, same)
+            loss_E_G, loss_att, loss_id, loss_rec = self.Loss_E_G(target_img, output, feature_map, output_feature_map,
+                                                                  z_id,
+                                                                  output_z_id, same)
 
             loss_G = loss_E_G + loss_GAN
 
@@ -98,7 +95,8 @@ class AEINet(pl.LightningModule):
         loss_E_G, loss_att, loss_id, loss_rec = self.Loss_E_G(target_img, output, feature_map, output_feature_map,
                                                               z_id, output_z_id, same)
         loss_G = loss_E_G + loss_GAN
-        return {"loss": loss_G, 'target': target_img[0].cpu(), 'source': source_img[0].cpu(),  "output": output[0].cpu(), }
+        return {"loss": loss_G, 'target': target_img[0].cpu(), 'source': source_img[0].cpu(),
+                "output": output[0].cpu(), }
 
     def validation_end(self, outputs):
         loss = torch.stack([x["loss"] for x in outputs]).mean()
@@ -112,15 +110,14 @@ class AEINet(pl.LightningModule):
 
         return {"loss": loss, "image": validation_image, }
 
-
     def configure_optimizers(self):
         lr_g = self.hp.model.learning_rate_E_G
         lr_d = self.hp.model.learning_rate_D
         b1 = self.hp.model.beta1
         b2 = self.hp.model.beta2
 
-        opt_g = torch.optim.Adam(list(self.G.parameters()) + list(self.E.parameters()), lr=lr_g, betas=(b1, b2))
-        opt_d = torch.optim.Adam(self.D.parameters(), lr=lr_d, betas=(b1, b2))
+        opt_g = Adam(list(self.G.parameters()) + list(self.E.parameters()), lr=lr_g, betas=(b1, b2))
+        opt_d = Adam(self.D.parameters(), lr=lr_d, betas=(b1, b2))
         return [opt_g, opt_d], []
 
     def train_dataloader(self):
@@ -128,9 +125,10 @@ class AEINet(pl.LightningModule):
             transforms.Resize((256, 256)),
             transforms.CenterCrop((256, 256)),
             transforms.ToTensor(),
-            ])
+        ])
         dataset = AEI_Dataset(self.hp.data.dataset_dir, transform=transform)
-        return DataLoader(dataset, batch_size=self.hp.model.batch_size, num_workers=self.hp.model.num_workers, drop_last=True)
+        return DataLoader(dataset, batch_size=self.hp.model.batch_size, num_workers=self.hp.model.num_workers,
+                          drop_last=True)
 
     def val_dataloader(self):
         transform = transforms.Compose([
