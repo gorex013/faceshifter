@@ -8,10 +8,8 @@ arcface:
   vector_size: 256
 
 data:
-  #  dataset_dir: '/media/vasile/SLOW DATA/00000/dataset_dir'
-  #  valset_dir: '/media/vasile/SLOW DATA/00000/valset_dir'
-  dataset_dir: '/media/vasile/SLOW DATA/faceshifter/dataset_dir'
-  valset_dir: '/media/vasile/SLOW DATA/faceshifter/valset_dir'
+  dataset_dir: '/content/drive/My Drive/dataset_dir'
+  valset_dir: '/content/drive/My Drive/valset_dir'
 
 model:
   learning_rate_E_G: 4e-4
