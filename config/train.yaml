@@ -4,10 +4,13 @@ log:
 
 
 arcface:
-  chkpt_path: 'Arcface.pth'
+#  chkpt_path: 'Arcface.pth'
+  chkpt_path: '/content/drive/My Drive/Arcface.pth'
   vector_size: 256
 
 data:
+  #  dataset_dir: '/media/vasile/SLOW DATA/faceshifter/dataset_dir'
+  #  valset_dir: '/media/vasile/SLOW DATA/faceshifter/valset_dir'
   dataset_dir: '/content/drive/My Drive/dataset_dir'
   valset_dir: '/content/drive/My Drive/valset_dir'
 
